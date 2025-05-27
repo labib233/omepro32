@@ -1,0 +1,719 @@
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1" name="viewport" />
+  <title>OMEPRO</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+    rel="stylesheet"
+  />
+  <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: "Inter", sans-serif;
+    }
+    /* Hide video controls */
+    video::-webkit-media-controls {
+      display: none !important;
+    }
+    video::-moz-media-controls {
+      display: none !important;
+    }
+    video::-ms-media-controls {
+      display: none !important;
+    }
+    video {
+      outline: none;
+    }
+    /* Sidebar styles */
+    .sidebar {
+      height: 100%;
+      width: 0;
+      position: fixed;
+      z-index: 100;
+      top: 0;
+      left: 0;
+      background-color: white;
+      overflow-x: hidden;
+      transition: 0.3s;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    }
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 100;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+    }
+    .modal-content {
+      background-color: white;
+      margin: 10% auto;
+      padding: 20px;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 500px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    /* Age verification overlay */
+    #ageVerificationOverlay {
+      position: fixed;
+      z-index: 110;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0,0,0,0.9);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 1.5rem;
+      text-align: center;
+      color: white;
+    }
+  </style>
+</head>
+<body class="bg-white relative">
+
+  <!-- Age Verification Overlay -->
+  <div id="ageVerificationOverlay" role="dialog" aria-modal="true" aria-labelledby="ageVerificationTitle" aria-describedby="ageVerificationDesc" style="display:none;">
+    <div class="max-w-md">
+      <h1 id="ageVerificationTitle" class="text-4xl font-extrabold mb-4">18+ Notice</h1>
+      <p id="ageVerificationDesc" class="mb-6 text-lg leading-relaxed">
+        WARNING:This site dosen't contain any adult content . But, You must be 18 years or older to access.<br />
+        By clicking "I am 18 or older", you confirm that you meet this age requirement.
+      </p>
+      <div class="flex justify-center space-x-4">
+        <button id="confirmAgeBtn" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-md text-lg focus:outline-none focus:ring-2 focus:ring-green-400">
+          I am 18 or older
+        </button>
+        <button id="denyAgeBtn" class="bg-gray-700 hover:bg-gray-800 text-white font-semibold py-3 px-6 rounded-md text-lg focus:outline-none focus:ring-2 focus:ring-gray-500">
+          I am under 18
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="flex items-center justify-between border-b border-gray-200 px-4 py-3">
+    <button id="menuBtn" aria-label="Menu" class="text-2xl text-black">
+      <i class="fas fa-bars"></i>
+    </button>
+    <div class="flex items-center space-x-2 text-black text-lg font-normal">
+      <div class="bg-[#2B3A4B] rounded-md p-1 flex items-center justify-center">
+        <i class="fas fa-camera text-white text-xl"></i>
+      </div>
+      <span class="select-none">OMEPRO SIMULATOR</span>
+    </div>
+    <div style="width: 24px"></div>
+  </header>
+
+  <!-- Sidebar Menu -->
+  <div id="sidebar" class="sidebar">
+    <div class="p-4">
+      <button id="closeSidebar" class="float-right text-2xl">&times;</button>
+      <div class="clear-both pt-8">
+        <h2 class="text-xl font-bold mb-4">OMEPRO SIMULATOR</h2>
+        <ul class="space-y-3">
+          <li><a href="#" id="aboutBtn" class="block py-2 hover:text-[#22C55E]">About</a></li>
+          <li><a href="#" id="privacyBtn" class="block py-2 hover:text-[#22C55E]">Privacy Policy</a></li>
+          <li><a href="#" id="termsBtn" class="block py-2 hover:text-[#22C55E]">Terms of Service</a></li>
+          <li><a href="#" id="contactBtn" class="block py-2 hover:text-[#22C55E]">Contact Us</a></li>
+          <li><a href="#" id="helpBtn" class="block py-2 hover:text-[#22C55E]">Help Center</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  
+
+  <!-- Video Section -->
+  <main class="flex flex-col md:flex-row">
+    <section id="localVideoSection" class="flex-1 bg-[#3B3B3B] relative flex items-center justify-center min-h-[40vh] md:min-h-[400px]">
+      <video id="localVideo" class="absolute inset-0 w-full h-full object-cover rounded-md" autoplay muted playsinline style="display:none"></video>
+      <img alt="Dark gray placeholder area with text 360,702 users online and a small green dot" id="placeholderImage" class="absolute inset-0 w-full h-full object-cover" src="https://storage.googleapis.com/a1aa/image/904df0e3-b3cb-4c88-cb82-dba32035b6e7.jpg" width="600" height="400" />
+      <div id="usersOnlineContainer" class="relative z-10 flex items-center space-x-2 text-white text-xs font-normal">
+        <div class="w-3 h-3 rounded-full bg-[#7AC70C]"></div>
+        <span id="usersOnline">Simulation Active</span>
+      </div>
+    </section>
+    <section id="remoteVideoSection" class="flex-1 bg-black flex items-center justify-center min-h-[40vh] md:min-h-[400px] relative">
+      <video id="remoteVideo" class="w-full h-full object-cover" autoplay muted playsinline></video>
+      <div id="loadingSpinner" class="absolute inset-0 flex items-center justify-center bg-black" style="display:none">
+        <svg class="animate-spin h-12 w-12 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+        </svg>
+      </div>
+    </section>
+  </main>
+
+  <!-- Mobile-Optimized Controls -->
+  <section class="flex flex-wrap gap-2 p-2 bg-white border-t border-gray-200">
+    <div class="flex w-full gap-2">
+      <button id="startBtn" class="flex-1 bg-gradient-to-b from-[#4ADE80] to-[#22C55E] text-white text-lg font-normal rounded-md py-3" type="button">
+        Start
+      </button>
+      <button id="stopBtn" class="flex-1 bg-pink-400 text-white text-lg font-normal rounded-md py-3" type="button" disabled>
+        Stop
+      </button>
+    </div>
+    <div class="flex w-full gap-2">
+      <button id="nextBtn" class="flex-1 bg-[#2563EB] text-white text-lg font-normal rounded-md py-3" type="button" disabled>
+        Next
+      </button>
+      <select id="countrySelect" aria-label="Country" class="flex-1 bg-gray-100 rounded-md py-3 px-2 text-gray-700 text-base font-normal border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+       <option value="">Country 🌎</option>
+      <option value="AF">Afghanistan</option>
+      <option value="AL">Albania</option>
+      <option value="DZ">Algeria</option>
+      <option value="AS">American Samoa</option>
+      <option value="AD">Andorra</option>
+      <option value="AO">Angola</option>
+      <option value="AI">Anguilla</option>
+      <option value="AQ">Antarctica</option>
+      <option value="AG">Antigua and Barbuda</option>
+      <option value="AR">Argentina</option>
+      <option value="AM">Armenia</option>
+      <option value="AW">Aruba</option>
+      <option value="AU">Australia</option>
+      <option value="AT">Austria</option>
+      <option value="AZ">Azerbaijan</option>
+      <option value="BS">Bahamas</option>
+      <option value="BH">Bahrain</option>
+      <option value="BD">Bangladesh</option>
+      <option value="BB">Barbados</option>
+      <option value="BY">Belarus</option>
+      <option value="BE">Belgium</option>
+      <option value="BZ">Belize</option>
+      <option value="BJ">Benin</option>
+      <option value="BM">Bermuda</option>
+      <option value="BT">Bhutan</option>
+      <option value="BO">Bolivia</option>
+      <option value="BA">Bosnia and Herzegovina</option>
+      <option value="BW">Botswana</option>
+      <option value="BR">Brazil</option>
+      <option value="IO">British Indian Ocean Territory</option>
+      <option value="VG">British Virgin Islands</option>
+      <option value="BN">Brunei</option>
+      <option value="BG">Bulgaria</option>
+      <option value="BF">Burkina Faso</option>
+      <option value="BI">Burundi</option>
+      <option value="KH">Cambodia</option>
+      <option value="CM">Cameroon</option>
+      <option value="CA">Canada</option>
+      <option value="CV">Cape Verde</option>
+      <option value="KY">Cayman Islands</option>
+      <option value="CF">Central African Republic</option>
+      <option value="TD">Chad</option>
+      <option value="CL">Chile</option>
+      <option value="CN">China</option>
+      <option value="CX">Christmas Island</option>
+      <option value="CC">Cocos Islands</option>
+      <option value="CO">Colombia</option>
+      <option value="KM">Comoros</option>
+      <option value="CK">Cook Islands</option>
+      <option value="CR">Costa Rica</option>
+      <option value="HR">Croatia</option>
+      <option value="CU">Cuba</option>
+      <option value="CW">Curacao</option>
+      <option value="CY">Cyprus</option>
+      <option value="CZ">Czech Republic</option>
+      <option value="CD">Democratic Republic of the Congo</option>
+      <option value="DK">Denmark</option>
+      <option value="DJ">Djibouti</option>
+      <option value="DM">Dominica</option>
+      <option value="DO">Dominican Republic</option>
+      <option value="TL">East Timor</option>
+      <option value="EC">Ecuador</option>
+      <option value="EG">Egypt</option>
+      <option value="SV">El Salvador</option>
+      <option value="GQ">Equatorial Guinea</option>
+      <option value="ER">Eritrea</option>
+      <option value="EE">Estonia</option>
+      <option value="ET">Ethiopia</option>
+      <option value="FK">Falkland Islands</option>
+      <option value="FO">Faroe Islands</option>
+      <option value="FJ">Fiji</option>
+      <option value="FI">Finland</option>
+      <option value="FR">France</option>
+      <option value="PF">French Polynesia</option>
+      <option value="GA">Gabon</option>
+      <option value="GM">Gambia</option>
+      <option value="GE">Georgia</option>
+      <option value="DE">Germany</option>
+      <option value="GH">Ghana</option>
+      <option value="GI">Gibraltar</option>
+      <option value="GR">Greece</option>
+      <option value="GL">Greenland</option>
+      <option value="GD">Grenada</option>
+      <option value="GU">Guam</option>
+      <option value="GT">Guatemala</option>
+      <option value="GG">Guernsey</option>
+      <option value="GN">Guinea</option>
+      <option value="GW">Guinea-Bissau</option>
+      <option value="GY">Guyana</option>
+      <option value="HT">Haiti</option>
+      <option value="HN">Honduras</option>
+      <option value="HK">Hong Kong</option>
+      <option value="HU">Hungary</option>
+      <option value="IS">Iceland</option>
+      <option value="IN">India</option>
+      <option value="ID">Indonesia</option>
+      <option value="IR">Iran</option>
+      <option value="IQ">Iraq</option>
+      <option value="IE">Ireland</option>
+      <option value="IM">Isle of Man</option>
+      <option value="PL">Palestine</option>
+      <option value="IT">Italy</option>
+      <option value="CI">Ivory Coast</option>
+      <option value="JM">Jamaica</option>
+      <option value="JP">Japan</option>
+      <option value="JE">Jersey</option>
+      <option value="JO">Jordan</option>
+      <option value="KZ">Kazakhstan</option>
+      <option value="KE">Kenya</option>
+      <option value="KI">Kiribati</option>
+      <option value="XK">Kosovo</option>
+      <option value="KW">Kuwait</option>
+      <option value="KG">Kyrgyzstan</option>
+      <option value="LA">Laos</option>
+      <option value="LV">Latvia</option>
+      <option value="LB">Lebanon</option>
+      <option value="LS">Lesotho</option>
+      <option value="LR">Liberia</option>
+      <option value="LY">Libya</option>
+      <option value="LI">Liechtenstein</option>
+      <option value="LT">Lithuania</option>
+      <option value="LU">Luxembourg</option>
+      <option value="MO">Macao</option>
+      <option value="MK">Macedonia</option>
+      <option value="MG">Madagascar</option>
+      <option value="MW">Malawi</option>
+      <option value="MY">Malaysia</option>
+      <option value="MV">Maldives</option>
+      <option value="ML">Mali</option>
+      <option value="MT">Malta</option>
+      <option value="MH">Marshall Islands</option>
+      <option value="MR">Mauritania</option>
+      <option value="MU">Mauritius</option>
+      <option value="MX">Mexico</option>
+      <option value="FM">Micronesia</option>
+      <option value="MD">Moldova</option>
+      <option value="MC">Monaco</option>
+      <option value="MN">Mongolia</option>
+      <option value="ME">Montenegro</option>
+      <option value="MS">Montserrat</option>
+      <option value="MA">Morocco</option>
+      <option value="MZ">Mozambique</option>
+      <option value="MM">Myanmar</option>
+      <option value="NA">Namibia</option>
+      <option value="NR">Nauru</option>
+      <option value="NP">Nepal</option>
+      <option value="NL">Netherlands</option>
+      <option value="NC">New Caledonia</option>
+      <option value="NZ">New Zealand</option>
+      <option value="NI">Nicaragua</option>
+      <option value="NE">Niger</option>
+      <option value="NG">Nigeria</option>
+      <option value="NU">Niue</option>
+      <option value="KP">North Korea</option>
+      <option value="MP">Northern Mariana Islands</option>
+      <option value="NO">Norway</option>
+      <option value="OM">Oman</option>
+      <option value="PK">Pakistan</option>
+      <option value="PW">Palau</option>
+      <option value="PS">Palestine</option>
+      <option value="PA">Panama</option>
+      <option value="PG">Papua New Guinea</option>
+      <option value="PY">Paraguay</option>
+      <option value="PE">Peru</option>
+      <option value="PH">Philippines</option>
+      <option value="PL">Poland</option>
+      <option value="PT">Portugal</option>
+      <option value="PR">Puerto Rico</option>
+      <option value="QA">Qatar</option>
+      <option value="CG">Republic of the Congo</option>
+      <option value="RE">Reunion</option>
+      <option value="RO">Romania</option>
+      <option value="RU">Russia</option>
+      <option value="RW">Rwanda</option>
+      <option value="BL">Saint Barthelemy</option>
+      <option value="SH">Saint Helena</option>
+      <option value="KN">Saint Kitts and Nevis</option>
+      <option value="LC">Saint Lucia</option>
+      <option value="MF">Saint Martin</option>
+      <option value="PM">Saint Pierre and Miquelon</option>
+      <option value="VC">Saint Vincent and the Grenadines</option>
+      <option value="WS">Samoa</option>
+      <option value="SM">San Marino</option>
+      <option value="ST">Sao Tome and Principe</option>
+      <option value="SA">Saudi Arabia</option>
+      <option value="SN">Senegal</option>
+      <option value="RS">Serbia</option>
+      <option value="SC">Seychelles</option>
+      <option value="SL">Sierra Leone</option>
+      <option value="SG">Singapore</option>
+      <option value="SX">Sint Maarten</option>
+      <option value="SK">Slovakia</option>
+      <option value="SI">Slovenia</option>
+      <option value="SB">Solomon Islands</option>
+      <option value="SO">Somalia</option>
+      <option value="ZA">South Africa</option>
+      <option value="KR">South Korea</option>
+      <option value="SS">South Sudan</option>
+      <option value="ES">Spain</option>
+      <option value="LK">Sri Lanka</option>
+      <option value="SD">Sudan</option>
+      <option value="SR">Suriname</option>
+      <option value="SZ">Swaziland</option>
+      <option value="SE">Sweden</option>
+      <option value="CH">Switzerland</option>
+      <option value="SY">Syria</option>
+      <option value="TW">Taiwan</option>
+      <option value="TJ">Tajikistan</option>
+      <option value="TZ">Tanzania</option>
+      <option value="TH">Thailand</option>
+      <option value="TG">Togo</option>
+      <option value="TK">Tokelau</option>
+      <option value="TO">Tonga</option>
+      <option value="TT">Trinidad and Tobago</option>
+      <option value="TN">Tunisia</option>
+      <option value="TR">Turkey</option>
+      <option value="TM">Turkmenistan</option>
+      <option value="TC">Turks and Caicos Islands</option>
+      <option value="TV">Tuvalu</option>
+      <option value="UG">Uganda</option>
+      <option value="UA">Ukraine</option>
+      <option value="AE">United Arab Emirates</option>
+      <option value="GB">United Kingdom</option>
+      <option value="US">United States</option>
+      <option value="UY">Uruguay</option>
+      <option value="UZ">Uzbekistan</option>
+      <option value="VU">Vanuatu</option>
+      <option value="VA">Vatican</option>
+      <option value="VE">Venezuela</option>
+      <option value="VN">Vietnam</option>
+      <option value="WF">Wallis and Futuna</option>
+      <option value="EH">Western Sahara</option>
+      <option value="YE">Yemen</option>
+      <option value="ZM">Zambia</option>
+      <option value="ZW">Zimbabwe</option>
+      </select>
+    </div>
+  </section>
+
+  <!-- Footer note -->
+  <footer class="p-3 max-w-4xl mx-auto mt-2">
+    <p class="bg-white shadow-md rounded-md px-4 py-2 text-sm text-gray-700">
+      By pressing <strong>“Start”</strong>, you agree to our
+      <a class="text-[#7AC70C] font-semibold underline" href="#" id="footerPrivacyBtn">Privacy Policy</a>.
+      Rule violators will be banned.
+    </p>
+    <div class="bg-yellow-100 border-l-4 border-yellow-500 p-4 mb-4">
+  <p class="font-bold">⚠️ DISCLAIMER: This is a SIMULATION.</p>
+  <p>OMEPRO is a <strong> video chat simulator</strong> for entertainment. All videos are pre-recorded.</p>
+</div>
+  </footer>
+
+  <!-- About Modal -->
+  <div id="aboutModal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" role="button" tabindex="0" aria-label="Close About Modal">&times;</span>
+      <h2 class="text-xl font-bold mb-4">About OMEPRO</h2>
+      <p>OMEPRO is a fake video chat platform that contains pre-recorded video clips to entertain people.</p>
+      <p class="mt-2">Version 2.1.4 | © 2025 OMEPRO Technologies</p>
+    </div>
+  </div>
+
+  <!-- Privacy Policy Modal -->
+  <div id="privacyModal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" role="button" tabindex="0" aria-label="Close Privacy Policy Modal">&times;</span>
+      <h2 class="text-xl font-bold mb-4">Privacy Policy</h2>
+      <p><strong>Last Updated:</strong> January 1, 2023</p>
+      <p class="mt-2">we dont collect information from useres . No sign up or Sign in recquired to use this site .</p>
+    </div>
+  </div>
+
+  <!-- Terms Modal -->
+  <div id="termsModal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" role="button" tabindex="0" aria-label="Close Terms of Service Modal">&times;</span>
+      <h2 class="text-xl font-bold mb-4">Terms of Service</h2>
+      <p><strong>Effective Date:</strong> 23/05/2025</p>
+      <p class="mt-2">OMEPRO Terms of Service
+
+Last Updated: [23/05/2025]
+1. Service Nature
+
+OMEPRO is an entertainment platform that simulates video chat experiences using prerecorded content and AI-generated interactions. By using OMEPRO, you acknowledge:
+
+    All interactions are simulated for entertainment purposes.
+
+    "Users" you encounter are not real people in real-time.
+
+2. No Real Connections
+
+    OMEPRO does not facilitate actual human-to-human video chats.
+
+    All video/audio content is prerecorded or AI-generated.
+
+    Features like "country filtering" or "user counts" are simulated effects.
+
+3. Prohibited Uses
+
+You agree not to:
+
+    Misrepresent OMEPRO as a real chat service.
+
+    Record/distribute content from the platform.
+
+    Reverse-engineer or exploit the simulation system.
+
+    Use OMEPRO for illegal or deceptive purposes.
+
+4. No Refunds
+
+    OMEPRO is a free entertainment product.
+
+    Any future premium features are non-refundable.
+
+5. Content Disclaimer
+
+    All videos/content are fictional. Any resemblance to real persons is coincidental.
+
+    OMEPRO does not guarantee "matches" or user counts reflect reality.
+
+6. Termination
+
+We may ban users who:
+
+    Spread misinformation about OMEPRO’s functionality.
+
+    Attempt to hack/alter the simulation.
+
+7. Limitation of Liability
+
+OMEPRO is not liable for:
+
+    Misinterpretations of the service’s simulated nature.
+
+    Emotional/distress claims from expecting real interactions.
+
+8. Age Requirement
+
+Users must be 18+. No real personal data is collected.</p>
+    </div>
+  </div>
+
+  <!-- Contact Modal -->
+  <div id="contactModal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" role="button" tabindex="0" aria-label="Close Contact Modal">&times;</span>
+      <h2 class="text-xl font-bold mb-4">Contact Us</h2>
+      <p>Email: labibtube72@gmail.com</p>
+      <p class="mt-2">Response time: 24-48 hours</p>
+    </div>
+  </div>
+
+<script>
+  // Age verification overlay logic (unchanged)
+  const ageOverlay = document.getElementById('ageVerificationOverlay');
+  const confirmAgeBtn = document.getElementById('confirmAgeBtn');
+  const denyAgeBtn = document.getElementById('denyAgeBtn');
+
+  function showAgeOverlay(show) {
+    ageOverlay.style.display = show ? 'flex' : 'none';
+    if(show) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+  }
+
+  function checkAgeVerification() {
+    if (!localStorage.getItem('ageVerified')) {
+      showAgeOverlay(true);
+    } else {
+      showAgeOverlay(false);
+    }
+  }
+
+  confirmAgeBtn.addEventListener('click', () => {
+    localStorage.setItem('ageVerified', 'true');
+    showAgeOverlay(false);
+  });
+
+  denyAgeBtn.addEventListener('click', () => {
+    alert("Access denied. You must be 18+ to use this service.");
+    window.location.href = "https://www.google.com";
+  });
+
+  // Run on page load
+  document.addEventListener('DOMContentLoaded', checkAgeVerification);
+
+  // Sidebar functionality (unchanged)
+  document.getElementById('menuBtn').addEventListener('click', function() {
+    document.getElementById('sidebar').style.width = '250px';
+  });
+
+  document.getElementById('closeSidebar').addEventListener('click', function() {
+    document.getElementById('sidebar').style.width = '0';
+  });
+
+  // Modal functionality (unchanged)
+  const modals = {
+    aboutBtn: 'aboutModal',
+    privacyBtn: 'privacyModal',
+    termsBtn: 'termsModal',
+    contactBtn: 'contactModal',
+    helpBtn: 'helpModal',
+    footerPrivacyBtn: 'privacyModal'
+  };
+
+  Object.entries(modals).forEach(([btnId, modalId]) => {
+    const btn = document.getElementById(btnId);
+    if(btn){
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById(modalId).style.display = 'block';
+        document.getElementById('sidebar').style.width = '0';
+      });
+    }
+  });
+
+  document.querySelectorAll('.close-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      this.closest('.modal').style.display = 'none';
+    });
+  });
+
+  window.addEventListener('click', function(event) {
+    if (event.target.classList.contains('modal')) {
+      event.target.style.display = 'none';
+    }
+  });
+
+  // Updated Video Functionality (Randomized)
+  const prerecordedVideos = [
+    "videos/1.mp4",
+    "videos/2.mp4",
+    "videos/3.mp4",
+    "videos/4.mp4",  
+    "videos/5.mp4",
+    "videos/6.mp4",
+    "videos/7.mp4",
+    "videos/8.mp4",
+    "videos/9.mp4",
+    "videos/10.mp4",
+    "videos/11.mp4",
+    "videos/12.mp4",
+    "videos/13.mp4",
+    "videos/14.mp4",
+    "videos/15.mp4",
+    "videos/16.mp4",
+    "videos/17.mp4",
+    "videos/18.mp4",
+    "videos/19.mp4",
+    "videos/20.mp4",
+    "videos/21.mp4"
+  ];
+
+  const remoteVideo = document.getElementById("remoteVideo");
+  const loadingSpinner = document.getElementById("loadingSpinner");
+  const startBtn = document.getElementById("startBtn");
+  const stopBtn = document.getElementById("stopBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const localVideo = document.getElementById("localVideo");
+  const placeholderImage = document.getElementById("placeholderImage");
+  const usersOnlineContainer = document.getElementById("usersOnlineContainer");
+
+  let currentVideoIndex = -1;
+  let playing = false;
+  let localStream = null;
+
+  function showLoading(show) {
+    loadingSpinner.style.display = show ? "flex" : "none";
+    remoteVideo.style.display = show ? "none" : "block";
+  }
+
+  function playVideo(index) {
+    if (index < 0 || index >= prerecordedVideos.length) return;
+    remoteVideo.src = prerecordedVideos[index];
+    remoteVideo.play();
+    playing = true;
+    nextBtn.disabled = false;
+    stopBtn.disabled = false;
+    startBtn.disabled = true;
+  }
+
+  function stopVideo() {
+    remoteVideo.pause();
+    remoteVideo.src = "";
+    playing = false;
+    nextBtn.disabled = true;
+    stopBtn.disabled = true;
+    startBtn.disabled = false;
+    showLoading(false);
+    if (localStream) {
+      localStream.getTracks().forEach(track => track.stop());
+      localStream = null;
+    }
+    localVideo.style.display = "none";
+    placeholderImage.style.display = "block";
+    usersOnlineContainer.style.display = "flex";
+  }
+
+  function nextVideo() {
+    if (!playing) return;
+    showLoading(true);
+    nextBtn.disabled = true;
+    stopBtn.disabled = true;
+    
+    setTimeout(() => {
+      // Generate a random index (avoid repeating the same video consecutively)
+      let newIndex;
+      do {
+        newIndex = Math.floor(Math.random() * prerecordedVideos.length);
+      } while (newIndex === currentVideoIndex && prerecordedVideos.length > 1);
+      
+      currentVideoIndex = newIndex;
+      playVideo(currentVideoIndex);
+      showLoading(false);
+    }, 2000);
+  }
+
+  async function startCamera() {
+    try {
+      localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      localVideo.srcObject = localStream;
+      localVideo.style.display = "block";
+      placeholderImage.style.display = "none";
+      usersOnlineContainer.style.display = "none";
+    } catch (err) {
+      alert("Could not access camera: " + err.message);
+    }
+  }
+
+  startBtn.addEventListener("click", async () => {
+    await startCamera();
+    currentVideoIndex = Math.floor(Math.random() * prerecordedVideos.length); // Start with a random video
+    playVideo(currentVideoIndex);
+    showLoading(false);
+  });
+
+  stopBtn.addEventListener("click", stopVideo);
+  nextBtn.addEventListener("click", nextVideo);
+
+  // Initially disable stop and next buttons
+  stopBtn.disabled = true;
+  nextBtn.disabled = true;
+</script>
+</body>
+</html>
